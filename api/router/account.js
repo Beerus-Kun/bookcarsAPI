@@ -331,6 +331,8 @@ router.patch('/change_info', Auth.authenLogined, async (req, res, next) => {
     }
 })
 
+//jfiơèioe
+//// fwefewfe
 /**
  * Chức năng quên mật khẩu
  * 
