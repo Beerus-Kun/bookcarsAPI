@@ -3,15 +3,15 @@ POST http://localhost:8000/account/signup
 Content-Type: application/json
 
 {
-    "username": "beerus",
+    "username": "beerus3",
     "password": "123456",
     "first_name": "Beerus",
     "last_name": "Sama",
-    "phone_number": "0123456785",
+    "phone_number": "0123456743",
     "address": "97",
     "day_of_birth": "1997-10-01",
     "gender": "0",
-    "mail":"12354@gmail.com"
+    "mail":"123wef@gmail.com"
 }
 
 ### login
@@ -19,22 +19,25 @@ POST http://localhost:8000/account/login
 Content-Type: application/json
 
 {
-    "username": "sieuquaytihon80@gmail.com",
-    "password": "123457"
+    "username": "beerus3",
+    "password": "123456"
 }
 
 ### change info
 PATCH http://localhost:8000/account/change_info
-Authorization: Beaer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF9hY2NvdW50IjozLCJ1c2VybmFtZSI6ImJlZXJ1cyIsInJvbGUiOlt7ImlkX3JvbGUiOjEsImlzX2FjdGl2ZSI6dHJ1ZX0seyJpZF9yb2xlIjoyLCJpc19hY3RpdmUiOnRydWV9XSwiaWF0IjoxNjQ3NDIxNDE0fQ.9qq7TrqSw8zUGYga6ZuXyxWBw7NyFR4szdfgTq6GzVY
+Authorization: Beaer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF9hY2NvdW50IjoxLCJ1c2VybmFtZSI6ImJlZXJ1cyIsInJvbGUiOlt7ImlkX3JvbGUiOjIsImlzX2FjdGl2ZSI6bnVsbH1dLCJpYXQiOjE2NDkwMzkzMzl9.3Wa2j3bp-L7g0jvQJm8u53xA01VwfdsqMKvPMrWYgUs
 Content-Type: application/json
 
 {
-    "mail":"sieuquaytihon80@gmail.com"
+    "mail":"sieuquaytihon80@gmail.com",
+    "phone_number":"0321456789",
+    "first_name":"beeeee",
+    "last_name":"russsss"
 }
 
 ### get information
 GET http://localhost:8000/account/information?info=12345678
-Authorization: Beaer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF9hY2NvdW50IjozLCJ1c2VybmFtZSI6ImJlZXJ1cyIsInJvbGUiOlt7ImlkX3JvbGUiOjEsImlzX2FjdGl2ZSI6dHJ1ZX0seyJpZF9yb2xlIjoyLCJpc19hY3RpdmUiOnRydWV9XSwiaWF0IjoxNjQ3NDIxNDE0fQ.9qq7TrqSw8zUGYga6ZuXyxWBw7NyFR4szdfgTq6GzVY
+Authorization: Beaer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF9hY2NvdW50IjozLCJ1c2VybmFtZSI6ImJlZXJ1czMiLCJyb2xlIjpbeyJpZF9yb2xlIjoyLCJpc19hY3RpdmUiOnRydWV9XSwiaWF0IjoxNjQ5MDQwMjk3fQ.KbIQmkIzyDuhqubJzF-rKwDZnMmF3sCOH2pn1RUfpeA
 
 ### forgot password
 PATCH http://localhost:8000/account/forgot_password

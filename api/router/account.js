@@ -160,7 +160,8 @@ router.post('/login', async (req, res, next) => {
             let encrypted_password = await Account.selectPassword(username);
             let match = await bcrypt.compare(password, encrypted_password.trim());
             if (match) {
-                let id = await Account.selectIdByUsername(username);
+                let person = await Account.selectByUsername(username);
+                let id = person.id;
                 let role = await Account.selectRoleByUsername(username);
                 let data = {
                     "id_account": id,
@@ -362,6 +363,8 @@ router.patch('/forgot_password', async (req, res, next) => {
         let existUsername = await Account.hasUsername(username);
 
         if (existUsername) {
+            let person = await Account.selectByUsername(username)
+
             if (code && new_password) {
                 if (code.length == Defaults.codeLength) {
                     if (new_password.length < Defaults.passwordLength) {
@@ -369,8 +372,7 @@ router.patch('/forgot_password', async (req, res, next) => {
                             code: 409
                         })
                     }
-
-                    let encryptedCode = await Account.selectCodeByUsername(username);
+                    let encryptedCode = person.code;
                     let match = await bcrypt.compare(code, encryptedCode.trim());
                     if (match) {
                         bcrypt.hash(new_password, saltRounds, async (err, hash) => {
@@ -381,7 +383,7 @@ router.patch('/forgot_password', async (req, res, next) => {
                             else {
                                 let updatePassword = await Account.updatePasswordByUsername(username, hash);
                                 let deleteCode = await Account.updateCodeByUsername(username, "");
-                                let id = await Account.selectIdByUsername(username);
+                                let id = await person.id;
                                 let role = await Account.selectRoleByUsername(username);
                                 let data = {
                                     "id_account": id,
@@ -415,7 +417,7 @@ router.patch('/forgot_password', async (req, res, next) => {
                 })
             } else {
                 let code = await createCode();
-                let email = await Account.selectMailByUsername(username);
+                let email = person.mail;
 
                 bcrypt.hash(code, saltRounds, async (err, hash) => {
                     if (err) {
@@ -457,7 +459,10 @@ router.patch('/forgot_password', async (req, res, next) => {
 router.get('/information', Auth.authenLogined, async (req, res, next) => {
     try {
         let info = req.query.info;
+        
         let id_account = Auth.tokenData(req).id_account;
+
+        let person = await Account.selectById(id_account);
         let data = {};
 
         if (!info) {
@@ -468,44 +473,37 @@ router.get('/information', Auth.authenLogined, async (req, res, next) => {
 
         // first_name
         if (info.indexOf('1') > -1) {
-            let first_name = await Account.selectFirstNameById(id_account);
-            data.first_name = first_name;
+            data.first_name = person.first_name;
         }
 
         // last_name
         if (info.indexOf('2') > -1) {
-            let last_name = await Account.selectLastNameById(id_account);
-            data.last_name = last_name;
+            data.last_name = person.last_name;
         }
 
         //phone_number
         if (info.indexOf('3') > -1) {
-            let phone_number = await Account.selectPhoneNumberById(id_account);
-            data.phone_number = phone_number;
+            data.phone_number = person.phone_number;
         }
 
         // day_of_birth
         if (info.indexOf('4') > -1) {
-            let day_of_birth = await Account.selectDayOfBirthById(id_account);
-            data.day_of_birth = day_of_birth;
+            data.day_of_birth = person.date;
         }
 
         // address
         if (info.indexOf('5') > -1) {
-            let address = await Account.selectAdressById(id_account);
-            data.address = address;
+            data.address = person.address;
         }
 
         // gender
         if (info.indexOf('6') > -1) {
-            let gender = await Account.selectGenderById(id_account);
-            data.gender = gender;
+            data.gender = person.gender;
         }
 
         // mail
         if (info.indexOf('7') > -1) {
-            let mail = await Account.selectMailById(id_account);
-            data.mail = mail.trim();
+            data.mail = person.mail.trim();
         }
 
         // username
@@ -514,8 +512,7 @@ router.get('/information', Auth.authenLogined, async (req, res, next) => {
         }
 
         if (info.indexOf('9') > -1) {
-            let image = await Account.selectImageById(id_account);
-            data.image = image;
+            data.image = person.image;
         }
 
         data.code = 211;
@@ -548,7 +545,8 @@ router.get('/information', Auth.authenLogined, async (req, res, next) => {
 // })
 
 async function deleteCode(username, code) {
-    let realCode = await Account.selectCodeByUsername(username);
+    let person = await Account.selectByUsername(username);
+    let realCode = person.code;
     if (realCode.trim() == code.trim()) {
         console.log("vo day")
         let deleteCode = await Account.updateCodeByUsername(username, "");

@@ -19,17 +19,6 @@ const db = {};
 //     })
 // }
 
-// db.insertCustomer = (username, password, first_name, last_name, phone_number, day_of_birth, address, gender, mail, id_role, image)=>{
-//     return new Promise((resolve, reject)=>{
-//         pool.query(`CALL SP_insertCustomer($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)`,
-//         [username, password, id_role, first_name, last_name, phone_number, day_of_birth, address, gender, mail, image],
-//         (err,result)=>{
-//             if(err) return reject(err);
-//             return resolve(result.rows)
-//         })
-//     })
-// }
-
 db.insertCustomer = (username, password, first_name, last_name, phone_number, day_of_birth, address, gender, mail, id_role, image)=>{
     return new Promise(async (resolve, reject)=>{
         const pool = await sql.connect(config);
@@ -60,7 +49,7 @@ db.hasMail = (mail)=>{
 
         pool.request()
             .input("mail", sql.NChar(50), mail)
-            .query('SELECT * FROM person WHERE mail=@mail',
+            .execute('SP_selectPersonByEmail',
             (err, result)=>{
                 if(err) return reject(err);
                 else resolve(result.rowsAffected>0)
@@ -74,7 +63,7 @@ db.hasPhoneNumber = (phone_number)=>{
 
         pool.request()
             .input("phone_number", sql.NChar(12), phone_number)
-            .query('SELECT * FROM person WHERE phone_number=@phone_number',
+            .execute('SP_selectPersonByPhonenumber',
             (err, result)=>{
                 if(err) return reject(err);
                 else resolve(result.rowsAffected>0)
@@ -88,7 +77,7 @@ db.hasUsername = (username)=>{
 
         pool.request()
             .input("username", sql.NChar(25), username)
-            .query('SELECT * FROM acount WHERE username = @username',
+            .execute('SP_selectPersonByUsername',
             (err, result)=>{
                 if(err) return reject(err);
                 else resolve(result.rowsAffected>0)
@@ -102,7 +91,7 @@ db.selectPassword = (username)=>{
 
         pool.request()
             .input("username", sql.NChar(25), username)
-            .query('SELECT password FROM acount WHERE username = @username',
+            .execute('SP_selectPasswordByUsername',
             (err, result)=>{
                 if(err) return reject(err);
                 else resolve(result.recordset[0].password)
@@ -116,7 +105,7 @@ db.selectUsernameByPhone = (phone_number)=>{
 
         pool.request()
             .input("phone_number", sql.NChar(12), phone_number)
-            .query('SELECT username FROM person WHERE phone_number = $phone_number',
+            .execute('SP_selectPersonByPhonenumber',
             (err, result)=>{
                 if(err) return reject(err);
                 else resolve(result.recordset[0].username)
@@ -130,7 +119,7 @@ db.selectUsernameByEmail = (email)=>{
 
         pool.request()
             .input("email", sql.NChar(50), email)
-            .query('SELECT username FROM person WHERE mail = @email',
+            .execute('SP_selectPersonByEmail',
             (err, result)=>{
                 if(err) return reject(err);
                 else resolve(result.recordset[0].username)
@@ -138,16 +127,16 @@ db.selectUsernameByEmail = (email)=>{
     })
 }
 
-db.selectIdByUsername = (username)=>{
+db.selectByUsername = (username)=>{
     return new Promise(async (resolve, reject)=>{
         const pool = await sql.connect(config);
 
         pool.request()
             .input("username", sql.NChar(25), username)
-            .query('SELECT id FROM person WHERE username = @username',
+            .execute('SP_selectPersonByUsername',
             (err, result)=>{
                 if(err) return reject(err);
-                else resolve(result.recordset[0].id)
+                else resolve(result.recordset[0])
             })
     })
 }
@@ -158,10 +147,7 @@ db.selectRoleByUsername = (username)=>{
 
         pool.request()
             .input("username", sql.NChar(25), username)
-            .query(`SELECT id_role, is_active 
-                FROM roleuser 
-                WHERE username = @username 
-                ORDER BY id_role`,
+            .execute(`SP_selectRoleByUsername`,
             (err, result)=>{
                 if(err) return reject(err);
                 else resolve(result.recordset)
@@ -169,142 +155,16 @@ db.selectRoleByUsername = (username)=>{
     })
 }
 
-db.selectFirstNameById = (id_account)=>{
+db.selectById = (id_account)=>{
     return new Promise(async (resolve, reject)=>{
         const pool = await sql.connect(config);
 
         pool.request()
             .input("id_account", sql.Int, id_account)
-            .query('SELECT first_name FROM person WHERE id=@id_account',
+            .execute('SP_selectPersonByIdAccount',
             (err, result)=>{
                 if(err) return reject(err);
-                else resolve(result.recordset[0].first_name)
-            })
-    })
-}
-
-db.selectLastNameById = (id_account)=>{
-    return new Promise(async (resolve, reject)=>{
-        const pool = await sql.connect(config);
-
-        pool.request()
-            .input("id_account", sql.Int, id_account)
-            .query('SELECT last_name FROM person WHERE id=@id_account',
-            (err, result)=>{
-                if(err) return reject(err);
-                else resolve(result.recordset[0].last_name)
-            })
-    })
-}
-
-db.selectPhoneNumberById = (id_account)=>{
-    return new Promise(async (resolve, reject)=>{
-        const pool = await sql.connect(config);
-
-        pool.request()
-            .input("id_account", sql.Int, id_account)
-            .query('SELECT phone_number FROM person WHERE id = @id_account',
-            (err, result)=>{
-                if(err) return reject(err);
-                else resolve(result.recordset[0].phone_number)
-            })
-    })
-}
-
-db.selectDayOfBirthById = (id_account)=>{
-    return new Promise(async (resolve, reject)=>{
-        const pool = await sql.connect(config);
-
-        pool.request()
-            .input("id_account", sql.Int, id_account)
-            .query('SELECT CONVERT(VARCHAR, day_of_birth, 103) as date FROM person WHERE id = @id_account',
-            (err, result)=>{
-                if(err) return reject(err);
-                else resolve(result.recordset[0].date)
-            })
-    })
-}
-
-db.selectAdressById = (id_account)=>{
-    return new Promise(async (resolve, reject)=>{
-        const pool = await sql.connect(config);
-
-        pool.request()
-            .input("id_account", sql.Int, id_account)
-            .query('SELECT address FROM person WHERE id=@id_account',
-            (err, result)=>{
-                if(err) return reject(err);
-                else resolve(result.recordset[0].address)
-            })
-    })
-}
-
-db.selectGenderById = (id_account)=>{
-    return new Promise(async (resolve, reject)=>{
-        const pool = await sql.connect(config);
-
-        pool.request()
-            .input("id_account", sql.Int, id_account)
-            .query('SELECT gender FROM person WHERE id=@id_account',
-            (err, result)=>{
-                if(err) return reject(err);
-                else resolve(result.recordset[0].gender)
-            })
-    })
-}
-
-db.selectMailById = (id_account)=>{
-    return new Promise(async (resolve, reject)=>{
-        const pool = await sql.connect(config);
-
-        pool.request()
-            .input("id_account", sql.Int, id_account)
-            .query('SELECT mail FROM person WHERE id=@id_account',
-            (err, result)=>{
-                if(err) return reject(err);
-                else resolve(result.recordset[0].mail)
-            })
-    })
-}
-
-db.selectImageById = (id_account)=>{
-    return new Promise(async (resolve, reject)=>{
-        const pool = await sql.connect(config);
-
-        pool.request()
-            .input("id_account", sql.Int, id_account)
-            .query('SELECT image FROM person WHERE id=@id_account',
-            (err, result)=>{
-                if(err) return reject(err);
-                else resolve(result.recordset[0].image)
-            })
-    })
-}
-
-db.selectCodeByUsername = (username)=>{
-    return new Promise(async (resolve, reject)=>{
-        const pool = await sql.connect(config);
-
-        pool.request()
-            .input("username", sql.NChar(25), username)
-            .query('SELECT code FROM person WHERE username = @username',
-            (err, result)=>{
-                if(err) return reject(err);
-                else resolve(result.recordset[0].code)
-            })
-    })
-}
-
-db.selectMailByUsername = (username)=>{
-    return new Promise(async (resolve, reject)=>{
-        const pool = await sql.connect(config);
-
-        pool.request()
-            .input("username", sql.NChar(25), username)
-            .query('SELECT mail FROM person WHERE username = @username',
-            (err, result)=>{
-                if(err) return reject(err);
-                else resolve(result.recordset[0].mail)
+                else resolve(result.recordset[0])
             })
     })
 }
@@ -316,9 +176,7 @@ db.updatePasswordByUsername = (username, password)=>{
         pool.request()
             .input("username", sql.NChar(25), username)
             .input("password", sql.NChar(128), password)
-            .query(`UPDATE acount
-                SET password = @password
-                WHERE username = @username`,
+            .execute(`SP_updatePasswordByUsername`,
             (err, result)=>{
                 if(err) return reject(err);
                 else resolve(result.recordset)
@@ -333,9 +191,7 @@ db.updateFirstNameById = (id_account, first_name)=>{
         pool.request()
             .input("id_account", sql.Int, id_account)
             .input("first_name", sql.NVarChar(50), first_name)
-            .query(`UPDATE person
-                SET first_name = @first_name
-                WHERE id = @id_account`,
+            .query(`SP_updateFirstNameByUsername`,
             (err, result)=>{
                 if(err) return reject(err);
                 else resolve(result.recordset)
@@ -350,9 +206,7 @@ db.updateLastNameById = (id_account, last_name)=>{
         pool.request()
             .input("id_account", sql.Int, id_account)
             .input("last_name", sql.NVarChar(50), last_name)
-            .query(`UPDATE person
-                SET last_name = @last_name
-                WHERE id = @id_account`,
+            .execute(`SP_updateLastNameById`,
             (err, result)=>{
                 if(err) return reject(err);
                 else resolve(result.recordset)
@@ -365,12 +219,9 @@ db.updatePhoneNumberById = (id_account, phone_number)=>{
         const pool = await sql.connect(config);
 
         pool.request()
-            .input("", sql.NChar(25), username)
             .input("id_account", sql.Int, id_account)
             .input("phone_number", sql.NChar(12), phone_number)
-            .query(`UPDATE person
-                SET phone_number = @phone_number
-                WHERE id = @id_account`,
+            .execute(`SP_updatePhoneNumberById`,
             (err, result)=>{
                 if(err) return reject(err);
                 else resolve(result.recordset)
@@ -385,9 +236,7 @@ db.updateDayOfBirthById = (id_account, day_of_birth)=>{
         pool.request()
             .input("id_account", sql.Int, id_account)
             .input("day_of_birth", sql.Date, day_of_birth)
-            .query(`UPDATE person
-                SET day_of_birth = @day_of_birth
-                WHERE id = @id_account`,
+            .execute(`SP_updateDayOfBirthById`,
             (err, result)=>{
                 if(err) return reject(err);
                 else resolve(result.recordset)
@@ -402,9 +251,7 @@ db.updateAdressById = (id_account, address)=>{
         pool.request()
             .input("id_account", sql.Int, id_account)
             .input("address", sql.NVarChar(250), address)
-            .query(`UPDATE person
-                SET address = @address
-                WHERE id = @id_account`,
+            .execute(`SP_updateAdressById`,
             (err, result)=>{
                 if(err) return reject(err);
                 else resolve(result.recordset)
@@ -419,9 +266,7 @@ db.updateGenderById = (id_account, gender)=>{
         pool.request()
             .input("id_account", sql.Int, id_account)
             .input("gender", sql.Bit, gender)
-            .query(`UPDATE person
-                SET gender = @gender
-                WHERE id = @id_account`,
+            .execute(`SP_updateGenderById`,
             (err, result)=>{
                 if(err) return reject(err);
                 else resolve(result.recordset)
@@ -436,9 +281,7 @@ db.updateMailById = (id_account, mail)=>{
         pool.request()
             .input("id_account", sql.Int, id_account)
             .input("mail", sql.NChar(50), mail)
-            .query(`UPDATE person
-                SET mail = @mail
-                WHERE id = @id_account`,
+            .execute(`SP_updateMailById`,
             (err, result)=>{
                 if(err) return reject(err);
                 else resolve(result.recordset)
@@ -453,9 +296,7 @@ db.updateCodeByUsername = (id_account, code)=>{
         pool.request()
             .input("id_account", sql.Int, id_account)
             .input("code", sql.NChar(128), code)
-            .query(`UPDATE person
-                SET code = @code
-                WHERE id = @id_account`,
+            .execute(`SP_updateCodeByUsername`,
             (err, result)=>{
                 if(err) return reject(err);
                 else resolve(result.recordset)
