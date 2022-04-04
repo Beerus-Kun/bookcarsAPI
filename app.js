@@ -1,6 +1,8 @@
 const express = require('express');
 const app = express();
 const dotenv = require('dotenv');
+var bodyParser = require('body-parser')
+
 
 dotenv.config();
 
@@ -10,6 +12,10 @@ app.use(express.json());
 
 // for parsing application/x-www-form-urlencoded
 app.use(express.urlencoded({ extended: true }));
+app.use(bodyParser.urlencoded({ extended: false }))
+
+// parse application/json
+app.use(bodyParser.json())
 
 // for parsing multipart/form-data
 // app.use(upload.array());

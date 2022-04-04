@@ -3,13 +3,13 @@ POST http://localhost:8000/account/signup
 Content-Type: application/json
 
 {
-    "username": "beerus2",
+    "username": "beerus",
     "password": "123456",
     "first_name": "Beerus",
     "last_name": "Sama",
     "phone_number": "0123456785",
-    "address": "97 Man Thiện",
-    "day_of_birth": "1997-10-1",
+    "address": "97",
+    "day_of_birth": "1997-10-01",
     "gender": "0",
     "mail":"12354@gmail.com"
 }
