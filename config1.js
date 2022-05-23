@@ -5,7 +5,7 @@ const config = {
     database: 'QL_DXE',
     server: 'localhost',
     port: 1433,
-    // driver: 'msnodesqlv8',
+    driver: 'msnodesqlv8',
     options : { trustServerCertificate: true }
 }
 

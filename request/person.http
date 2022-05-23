@@ -1,0 +1,15 @@
+### sign up
+GET http://localhost:8000/person/api/get_booking_by_id?id=1
+Content-Type: application/json
+
+{
+    "username": "beerus4",
+    "password": "123456",
+    "first_name": "Beerus",
+    "last_name": "Sama",
+    "phone_number": "0123456467",
+    "address": "97",
+    "day_of_birth": "1997-10-01",
+    "gender": "0",
+    "mail":"45678@gmail.com"
+}

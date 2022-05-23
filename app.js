@@ -32,12 +32,13 @@ app.use((error, req, res, next) => {
 
 // Account
 app.use(`/account`, require(`${apiUrl}account`));
-// // Account
+// Trasport
+app.use(`/transport`, require(`${apiUrl}transport`));
 // app.use(`/bill`, require(`${apiUrl}/bill`));
-// // Account
-// app.use(`/brand`, require(`${apiUrl}/brand`));
-// // Account
-// app.use(`/cart`, require(`${apiUrl}/cart`));
+// Booking
+app.use(`/booking`, require(`${apiUrl}booking`));
+// Account
+app.use(`/person`, require(`${apiUrl}/person`));
 // // Account
 // app.use(`/feedback`, require(`${apiUrl}/feedback`));
 // // Account

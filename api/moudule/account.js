@@ -11,7 +11,7 @@ const db = {};
 
 //         pool.request()
 //             .input("", sql.NChar(25), username)
-//             .query('',
+//             .execute('',
 //             (err, result)=>{
 //                 if(err) return reject(err);
 //                 else resolve(result.recordset)
@@ -36,6 +36,24 @@ db.insertCustomer = (username, password, first_name, last_name, phone_number, da
             .input("id_role", sql.Int, id_role)
             .input("image", sql.NChar(250), image)
             .execute('SP_insertCustomer',
+            (err, result)=>{
+                if(err) return reject(err);
+                else resolve(result.recordset)
+            })
+    })
+}
+
+db.insertDriver = (driving_license, number_plate, id_transport_detail, id_driver, username)=>{
+    return new Promise(async (resolve, reject)=>{
+        const pool = await sql.connect(config);
+
+        pool.request()
+            .input("driving_license", sql.NChar(15), driving_license)
+            .input("number_plate", sql.NChar(10), number_plate)
+            .input("id_transport_detail", sql.Int, id_transport_detail)
+            .input("id_driver", sql.Int, id_driver)
+            .input("username", username)
+            .execute('SP_insertDriver',
             (err, result)=>{
                 if(err) return reject(err);
                 else resolve(result.recordset)

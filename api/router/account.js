@@ -6,7 +6,7 @@ const saltRounds = 10;
 const Mailer = require('../../mail');
 const router = express.Router();
 const Account = require('../moudule/account');
-var Auth = require('../../auth');
+const Auth = require('../../auth');
 const Validation = require('../../validation');
 const Defaults = require('../../default');
 const isImageURL = require('image-url-validator').default;
@@ -33,7 +33,7 @@ router.post('/signup', async (req, res, next) => {
         let gender = req.body.gender;
         let mail = req.body.mail;
 
-        if (username && password && first_name && last_name && phone_number && day_of_birth && address && gender && mail) {
+        if (username && password && first_name && last_name && phone_number && day_of_birth && address && mail) {
             if (password.trim() == "") {
                 return res.json({
                     code: 400
@@ -155,26 +155,47 @@ router.post('/login', async (req, res, next) => {
             }
         }
 
-        let existUsername = await Account.hasUsername(username);
+        let existUsername = await Account.hasUsername(username.toLowerCase());
+        console.log(username)
+        console.log(existUsername)
         if (existUsername) {
+            // console.log(password)
             let encrypted_password = await Account.selectPassword(username);
             let match = await bcrypt.compare(password, encrypted_password.trim());
             if (match) {
                 let person = await Account.selectByUsername(username);
                 let id = person.id;
                 let role = await Account.selectRoleByUsername(username);
-                let data = {
-                    "id_account": id,
-                    "username": username.trim(),
-                    "role": role
+
+                let invalid = 0;
+                for (let ro of role) {
+                    if (ro.is_active == false) invalid += 1;
                 }
 
-                const accessToken = jwt.sign(data, process.env.ACCESS_TOKEN_SECRET);
+                if (invalid == role.length) {
+                    return res.json({
+                        code: 418
+                    })
+                } else {
+                    let data = {
+                        "id_account": id,
+                        "username": username.trim(),
+                        "role": role
+                    }
 
-                return res.json({
-                    code: 202,
-                    accessToken: accessToken
-                });
+                    const accessToken = jwt.sign(data, process.env.ACCESS_TOKEN_SECRET);
+
+                    return res.json({
+                        code: 202,
+                        accessToken: accessToken,
+                        email: person.mail.trim(),
+                        first_name: person.first_name.trim(),
+                        last_name: person.last_name.trim(),
+                        role: role
+                    });
+                }
+
+
             } else {
                 return res.json({
                     code: 406
@@ -454,15 +475,17 @@ router.patch('/forgot_password', async (req, res, next) => {
  * @returns     400, 211
  * @regulation  first_name = 1, last_name=2, phone_number = 3, 
  *              day_of_birth = 4, address = 5, image = 9,
- *              gender = 6, mail = 7, username = 8
+ *              gender = 6, mail = 7, username = 8, balance = b
  */
-router.get('/information', Auth.authenLogined, async (req, res, next) => {
+router.get('/information', async (req, res, next) => {
     try {
         let info = req.query.info;
-        
-        let id_account = Auth.tokenData(req).id_account;
+        let email = req.require.email;
+        let username = await Account.selectUsernameByEmail(email);
 
-        let person = await Account.selectById(id_account);
+        // let id_account = Auth.tokenData(req).id_account;
+
+        let person = await Account.selectByUsername(username);
         let data = {};
 
         if (!info) {
@@ -511,13 +534,63 @@ router.get('/information', Auth.authenLogined, async (req, res, next) => {
             data.username = Auth.tokenData(req).username;
         }
 
+        // image
         if (info.indexOf('9') > -1) {
             data.image = person.image;
+        }
+
+        // balance
+        if (info.indexOf('b') > -1) {
+            data.balance = person.balance;
         }
 
         data.code = 211;
 
         return res.json(data);
+
+
+    } catch (err) {
+        console.log(err);
+        return res.sendStatus(500);
+    }
+})
+
+/**
+ * Yêu cầu trở thành tài xế
+ * 
+ * @permisson   đã đăng nhập
+ * @body        driving_license, number_plate, id_transport_detail, 
+ * @returns     417, 214
+ */
+router.post('/to_driver', Auth.authenLogined, async (req, res, next) => {
+    try {
+        let driving_license = req.body.driving_license;
+        let number_plate = req.body.number_plate;
+        let id_transport_detail = req.body.id_transport_detail;
+
+        if (driving_license && number_plate && id_transport_detail) {
+            let username = Auth.tokenData(req).username;
+            let roles = await Account.selectRoleByUsername(username);
+
+            for (let role of roles) {
+                if (role.id_role == 3) {
+                    return res.json({
+                        code: 417
+                    })
+                }
+            }
+
+
+            let id_driver = Auth.tokenData(req).id_account;
+            let create = await Account.insertDriver(driving_license, number_plate, id_transport_detail, id_driver, username);
+            return res.json({
+                code: 214
+            })
+        } else {
+            return res.json({code: 400})
+        }
+
+
 
 
     } catch (err) {

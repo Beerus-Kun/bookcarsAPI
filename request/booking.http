@@ -1,0 +1,13 @@
+### create booking
+POST http://localhost:8000/booking/create
+Authorization: Beaer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF9hY2NvdW50IjozLCJ1c2VybmFtZSI6ImJlZXJ1czMiLCJyb2xlIjpbeyJpZF9yb2xlIjoyLCJpc19hY3RpdmUiOnRydWV9XSwiaWF0IjoxNjUzMjM2NzUzfQ.bbo5I6yLCAW3aOHcmOlMYBmYtiiivD0MLBNrtSHsXpw
+Content-Type: application/json
+
+{
+    "distance" : "132",
+    "total" : "1646",
+    "start_point": "97 man thien",
+    "end_point": "99 man thien"
+}
+
+# distance, total, start_point, end_point

@@ -3,15 +3,15 @@ POST http://localhost:8000/account/signup
 Content-Type: application/json
 
 {
-    "username": "beerus3",
+    "username": "beerus4",
     "password": "123456",
     "first_name": "Beerus",
     "last_name": "Sama",
-    "phone_number": "0123456743",
+    "phone_number": "0123456467",
     "address": "97",
     "day_of_birth": "1997-10-01",
     "gender": "0",
-    "mail":"123wef@gmail.com"
+    "mail":"45678@gmail.com"
 }
 
 ### login
@@ -36,8 +36,8 @@ Content-Type: application/json
 }
 
 ### get information
-GET http://localhost:8000/account/information?info=12345678
-Authorization: Beaer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF9hY2NvdW50IjozLCJ1c2VybmFtZSI6ImJlZXJ1czMiLCJyb2xlIjpbeyJpZF9yb2xlIjoyLCJpc19hY3RpdmUiOnRydWV9XSwiaWF0IjoxNjQ5MDQwMjk3fQ.KbIQmkIzyDuhqubJzF-rKwDZnMmF3sCOH2pn1RUfpeA
+GET http://localhost:8000/account/information?info=12345678b
+Authorization: Beaer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF9hY2NvdW50Ijo2LCJ1c2VybmFtZSI6IkJlZXJ1czQiLCJyb2xlIjpbeyJpZF9yb2xlIjoyLCJpc19hY3RpdmUiOnRydWV9LHsiaWRfcm9sZSI6MywiaXNfYWN0aXZlIjp0cnVlfV0sImlhdCI6MTY1MzMxNDM4Mn0.-G3Z8Z0XXkacpJgxICmll9adP-SuThkCgvD09W7T_Ww
 
 ### forgot password
 PATCH http://localhost:8000/account/forgot_password
@@ -48,4 +48,17 @@ Content-Type: application/json
     "code":"741405",
     "new_password":"123457"
 
+}
+
+
+### driver registration
+POST http://localhost:8000/account/to_driver
+Authorization: Beaer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF9hY2NvdW50IjozLCJ1c2VybmFtZSI6ImJlZXJ1czMiLCJyb2xlIjpbeyJpZF9yb2xlIjoyLCJpc19hY3RpdmUiOnRydWV9XSwiaWF0IjoxNjUzMjM2NzUzfQ.bbo5I6yLCAW3aOHcmOlMYBmYtiiivD0MLBNrtSHsXpw
+Content-Type: application/json
+
+{
+    // driving_license, number_plate, id_transport_detail
+    "driving_license" : "1234",
+    "number_plate": "fwegweg",
+    "id_transport_detail": 1
 }
