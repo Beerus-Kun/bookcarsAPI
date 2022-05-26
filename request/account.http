@@ -36,7 +36,7 @@ Content-Type: application/json
 }
 
 ### get information
-GET http://localhost:8000/account/information?info=12345678b
+GET https://www.example.com/account/information?info=12345678b
 Authorization: Beaer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF9hY2NvdW50Ijo2LCJ1c2VybmFtZSI6IkJlZXJ1czQiLCJyb2xlIjpbeyJpZF9yb2xlIjoyLCJpc19hY3RpdmUiOnRydWV9LHsiaWRfcm9sZSI6MywiaXNfYWN0aXZlIjp0cnVlfV0sImlhdCI6MTY1MzMxNDM4Mn0.-G3Z8Z0XXkacpJgxICmll9adP-SuThkCgvD09W7T_Ww
 
 ### forgot password

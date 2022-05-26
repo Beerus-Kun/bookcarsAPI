@@ -365,9 +365,10 @@ router.patch('/forgot_password', async (req, res, next) => {
         let username = req.body.username;
         let code = req.body.code;
         let new_password = req.body.new_password;
-
+        
         let isEmail = Validation.isEmail(username);
         if (isEmail) {
+            console.log(1)
             let existMail = await Account.hasMail(username);
             if (existMail) {
                 username = await Account.selectUsernameByEmail(username);
@@ -375,17 +376,19 @@ router.patch('/forgot_password', async (req, res, next) => {
         }
         let isPhoneNumber = Validation.isNumber(username);
         if (isPhoneNumber) {
+            console.log(2)
             let existPhoneNumber = await Account.hasPhoneNumber(username);
             if (existPhoneNumber) {
                 username = await Account.selectUsernameByPhone(username);
             }
         }
-
+        console.log(3)
         let existUsername = await Account.hasUsername(username);
 
         if (existUsername) {
+            
             let person = await Account.selectByUsername(username)
-
+            console.log(person)
             if (code && new_password) {
                 if (code.length == Defaults.codeLength) {
                     if (new_password.length < Defaults.passwordLength) {
@@ -403,8 +406,9 @@ router.patch('/forgot_password', async (req, res, next) => {
                             }
                             else {
                                 let updatePassword = await Account.updatePasswordByUsername(username, hash);
-                                let deleteCode = await Account.updateCodeByUsername(username, "");
+                                let deleteCode = await Account.updateCodeByUsername(person.id, "");
                                 let id = await person.id;
+                                // console.log(id)
                                 let role = await Account.selectRoleByUsername(username);
                                 let data = {
                                     "id_account": id,
@@ -437,6 +441,7 @@ router.patch('/forgot_password', async (req, res, next) => {
                     code: 400
                 })
             } else {
+                console.log(5)
                 let code = await createCode();
                 let email = person.mail;
 
@@ -448,7 +453,9 @@ router.patch('/forgot_password', async (req, res, next) => {
                     else {
                         let send = Mailer.sendVerification(email, code);
                         code = hash;
-                        let saveCode = await Account.updateCodeByUsername(username, code);
+                        console.log(7)
+                        let saveCode = await Account.updateCodeByUsername(person.id, code);
+                        console.log(8)
                         let del = autoDeleteCode(username, code);
                         res.json({
                             code: 213,
@@ -567,11 +574,15 @@ router.post('/to_driver', Auth.authenLogined, async (req, res, next) => {
         let driving_license = req.body.driving_license;
         let number_plate = req.body.number_plate;
         let id_transport_detail = req.body.id_transport_detail;
-
+        console.log(id_transport_detail)
+        console.log(number_plate)
+        console.log(driving_license)
         if (driving_license && number_plate && id_transport_detail) {
+            
             let username = Auth.tokenData(req).username;
             let roles = await Account.selectRoleByUsername(username);
-
+            console.log(username)
+            console.log(roles)
             for (let role of roles) {
                 if (role.id_role == 3) {
                     return res.json({
@@ -589,10 +600,6 @@ router.post('/to_driver', Auth.authenLogined, async (req, res, next) => {
         } else {
             return res.json({code: 400})
         }
-
-
-
-
     } catch (err) {
         console.log(err);
         return res.sendStatus(500);

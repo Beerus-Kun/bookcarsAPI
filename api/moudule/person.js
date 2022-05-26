@@ -58,7 +58,7 @@ db.getInformationPersonById = async (id) => {
       .input('id', sql.INT, id)
       .execute('SP_GetInformationById', (err, result) => {
         if (err) return reject(err);
-        else resolve(result.recordset);
+        else resolve(result.recordset[0]);
       });
   });
 };
@@ -79,7 +79,7 @@ db.getBookingById = async (id) => {
       .input('id', sql.INT, id)
       .execute('SP_GET_BOOKING_BY_ID', (err, result) => {
         if (err) return reject(err);
-        else resolve(result.recordset);
+        else resolve(result.recordset[0]);
       });
   });
 };
@@ -91,7 +91,7 @@ db.getDriverByMail = async (mail) => {
       .input('mail', sql.NVARCHAR(100), mail)
       .execute('SP_GET_DRIVER_BY_Mail', (err, result) => {
         if (err) return reject(err);
-        else resolve(result.recordset);
+        else resolve(result.recordset[0]);
       });
   });
 };
@@ -104,7 +104,7 @@ db.getPhoneByMail = async (mail) => {
       .input('mail', sql.NVARCHAR(100), mail)
       .execute('SP_GET_PHONE_BY_MAIL', (err, result) => {
         if (err) return reject(err);
-        else resolve(result.recordset);
+        else resolve(result.recordset[0]);
       });
   });
 };
@@ -118,6 +118,21 @@ db.updateBookingReceiveByDriver = async (mail, id) => {
       .input('mail', sql.NVARCHAR(100), mail)
       .input('id', sql.INT, id)
       .execute('SP_RECEIVE_DRIVER_TO_BOOKING', (err, result) => {
+        if (err) return reject(err);
+        else resolve(result.recordset);
+      });
+  });
+};
+
+db.updateBookingFinishedByDriver = async (id) => {
+  return new Promise(async (resolve, reject) => {
+    const pool = await sql.connect(config);
+
+    pool
+      .request()
+      // .input('mail', sql.NVARCHAR(100), mail)
+      .input('id', sql.INT, id)
+      .execute('SP_UPDATE_STATE', (err, result) => {
         if (err) return reject(err);
         else resolve(result.recordset);
       });

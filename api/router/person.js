@@ -41,4 +41,14 @@ router.get('/api/update_booking_receive', async (req, res, next) => {
   return res.json(result);
 });
 
+router.get('/api/update_booking_finished', async (req, res, next) => {
+  console.log(req.query.id);
+  // console.log(req.query.mail);
+  const result = await Person.updateBookingFinishedByDriver(
+    // req.query.mail,
+    req.query.id
+  );
+  return res.json(result);
+});
+
 module.exports = router;

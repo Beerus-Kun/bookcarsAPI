@@ -13,3 +13,7 @@ Content-Type: application/json
     "gender": "0",
     "mail":"45678@gmail.com"
 }
+
+### sign up
+GET http://localhost:8000/person/api/get_driver_by_mail?mail=000@gmail
+Content-Type: application/json
